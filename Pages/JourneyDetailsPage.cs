@@ -1,5 +1,6 @@
-using System.Diagnostics;
 using Microsoft.Playwright;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 using TfLJourneyPlanner.Automation.Tools;
 
 namespace TfLJourneyPlanner.Automation.Pages
@@ -44,11 +45,9 @@ namespace TfLJourneyPlanner.Automation.Pages
                 // Network idle can be flaky on public websites.
             }
 
-            var stationLocator = Page.GetByText(stationName).First;
-            if (!await WaitHelper.IsVisibleAsync(stationLocator, 5000))
-            {
-                stationLocator = Page.Locator("text=/Covent Garden/i").First;
-            }
+            // DYNAMIC FIX: Use a case-insensitive regex based on the passed parameter, 
+            // removing the hardcoded "Covent Garden" fallback.
+            var stationLocator = Page.Locator($"text=/{Regex.Escape(stationName)}/i").First;
 
             try
             {
@@ -60,7 +59,8 @@ namespace TfLJourneyPlanner.Automation.Pages
             }
             catch
             {
-                // If station name isn't found exactly, we proceed to check for access info anyway.
+                // If station name isn't found exactly, we proceed to check for access info anyway 
+                // (as the access info might be in a different section of the DOM).
             }
 
             // IMPLEMENTATION NOTE: Custom Polling with a Safety Net
