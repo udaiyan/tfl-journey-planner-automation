@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x' # Change this to 7.0.x if your project targets .NET 7
+        dotnet-version: '8.0.x'
     
     - name: Restore dependencies
       run: dotnet restore
@@ -24,9 +24,12 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
       
-    - name: Install Playwright Dependencies
-      # CRITICAL: --with-deps installs the OS-level libraries required for Chromium on Linux
-      run: pwsh bin/Debug/net8.0/playwright.ps1 install --with-deps chromium
+    - name: Install Playwright CLI
+      run: dotnet tool install --global Microsoft.Playwright.CLI
+      
+    - name: Install Playwright Browsers & OS Dependencies
+      # This installs Chromium and all required Linux OS libraries
+      run: playwright install --with-deps chromium
       
     - name: Run Tests
       run: dotnet test --no-build --verbosity normal
