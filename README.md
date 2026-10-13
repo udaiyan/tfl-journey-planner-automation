@@ -46,5 +46,11 @@ AI tools (specifically Large Language Models) were utilized responsibly during t
 
 ---
 
+## Future Improvements & Technical Debt
+While the current framework successfully fulfills the challenge requirements, the following architectural improvements would be implemented for a long-term, enterprise-scale rollout:
+
+* **Dynamic Location Handling:** Currently, the `JourneyPlannerWidget` uses hardcoded mappings (`IsKnownValidLocation`) to translate full station names into partial autocomplete triggers. To support a wider matrix of locations, this logic should be refactored to either dynamically select the first available autocomplete suggestion regardless of the input string, or externalize the location mappings to a JSON/CSV data file to remove conditional logic from the Page Object.
+* **API-Driven Test Data Setup:** To reduce UI flakiness and execution time, valid journey locations could be seeded by querying the TfL backend API directly, rather than relying on the UI autocomplete dropdowns for test setup.
+
 ## Additional Test Scenarios
 Please refer to the [AdditionalScenarios.md](./AdditionalScenarios.md) file for a list of recommended functional and non-functional test scenarios for this public-facing component.
