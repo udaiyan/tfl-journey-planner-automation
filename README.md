@@ -40,6 +40,21 @@ Automating public-facing websites often requires handling aggressive UI overlays
 * **Custom Polling with Safety Nets:** For complex assertions (e.g., verifying accessibility info while ignoring generic footer links), native Playwright waits were insufficient. Custom polling loops utilizing a `Stopwatch` safety net were implemented to prevent infinite hangs while accurately evaluating conditional UI states.
 * **Dynamic Fallbacks:** Because short journeys (Leicester Square to Covent Garden) only display "Walking/Cycling" by default, the "View Details" button is missing. The framework dynamically detects this, applies the "Least walking" preference to force a Tube journey, and then retries, ensuring the test fulfills the business requirement without hardcoding brittle waits.
 
+## CI/CD Pipeline & Bot Protection Note
+⚠️ **Important:** The GitHub Actions pipeline is configured and functional, but tests may fail in the CI environment due to Transport for London's Web Application Firewall (WAF) blocking shared GitHub Actions IP addresses.
+
+**Why this happens:**
+- GitHub Actions runners use public, shared Azure IP addresses
+- TfL employs aggressive bot protection mechanisms (e.g., Akamai/Cloudflare) to prevent automated scraping
+- These security systems detect and block the CI environment, preventing the Journey Planner widget from loading
+
+**How this is resolved in enterprise environments:**
+1. **Self-hosted runners with static IPs:** Run the CI pipeline on TfL's internal network or approved static IP addresses that are allow-listed
+2. **API mocking:** Mock the TfL backend API responses for CI validation, reserving full UI E2E tests for a staging environment with relaxed WAF rules
+3. **Test environment:** Use a dedicated test/staging environment of the TfL website that has bot protection disabled for automation
+
+**Local execution:** All tests pass successfully when run locally, demonstrating the framework is functionally correct. The CI failures are infrastructure-related, not code-related.
+
 ## AI Disclaimer
 **Responsible Use of AI:** 
 AI tools (specifically Large Language Models) were utilized responsibly during the development of this framework. AI was used to assist in generating boilerplate code, debugging complex Playwright locator issues (such as the cookie overlay interception), and refactoring code for senior-level best practices (like the Override Pattern and lazy initialization). However, the overall architectural decisions, test strategy, Page Object design, and the handling of specific TfL UI quirks were driven by manual analysis, domain knowledge, and senior test automation principles.
